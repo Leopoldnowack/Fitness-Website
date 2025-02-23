@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Tracker</title>
+    <style>
+        /* Allgemeines Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        /* Anmeldefenster */
+        #login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+        }
+
+        #login-form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            text-align: center;
+        }
+
+        #login-form h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        #login-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        #login-form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        #login-form button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2575fc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #login-form button:hover {
+            background-color: #1a5bbf;
+        }
+
+        /* Hauptwebsite */
+        #main-website {
+            display: none; /* Versteckt die Hauptwebsite zunächst */
+        }
+
+        /* Menü */
+        #menu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            cursor: pointer;
+            font-size: 24px;
+            color: #2575fc;
+            z-index: 1000;
+        }
+
+        #menu-content {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 20px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        #menu-content a {
+            display: block;
+            margin: 10px 0;
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        #menu-content a:hover {
+            color: #2575fc;
+        }
+
+        /* Hauptinhalt */
+        #content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Abschnitte */
+        section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        section h2 {
+            color: #2575fc;
+            margin-bottom: 20px;
+        }
+
+        /* Startseite */
+        #home ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+
+        #home ul li {
+            margin: 10px 0;
+        }
+
+        /* Kalorien-Tracker */
+        #kalorien .tracker-info {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        #kalorien .tracker-info div {
+            flex: 1;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        /* Schritte-Tracker */
+        #schritte .tracker-info {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        #schritte .tracker-info div {
+            flex: 1;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        /* Fitness-Übungen */
+        #uebungen .stopwatch {
+            margin-bottom: 20px;
+        }
+
+        #uebungen .stopwatch button {
+            margin-right: 10px;
+            padding: 10px 20px;
+            background-color: #2575fc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #uebungen .stopwatch button:hover {
+            background-color: #1a5bbf;
+        }
+
+        #uebungen ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+
+        #uebungen ul li {
+            margin: 10px 0;
+        }
+
+        /* Fitness-Pläne */
+        #plaene .plan-options {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        #plaene .plan-options button {
+            padding: 10px 20px;
+            background-color: #2575fc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #plaene .plan-options button:hover {
+            background-color: #1a5bbf;
+        }
+
+        #plaene .plan-details {
+            display: none;
+            margin-top: 20px;
+        }
+
+        #plaene .plan-details.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Anmeldefenster -->
+    <div id="login-screen">
+        <form id="login-form">
+            <h2>Anmeldung</h2>
+            <label for="email">E-Mail:</label>
+            <input type="email" id="email" required>
+            <label for="password">Passwort:</label>
+            <input type="password" id="password" required>
+            <button type="submit">Anmelden</button>
+        </form>
+    </div>
+
+    <!-- Hauptwebsite -->
+    <div id="main-website">
+        <!-- Menü -->
+        <div id="menu">☰</div>
+        <div id="menu-content">
+            <a href="#home">Startseite</a>
+            <a href="#kalorien">Kalorien-Tracker</a>
+            <a href="#schritte">Schritte-Tracker</a>
+            <a href="#uebungen">Fitness-Übungen</a>
+            <a href="#plaene">Fitness-Pläne</a>
+        </div>
+
+        <!-- Hauptinhalt -->
+        <div id="content">
+            <!-- Startseite -->
+            <section id="home">
+                <h2>Willkommen zur Fitness-Website!</h2>
+                <p>Hier findest du alles, was du brauchst, um fit und gesund zu bleiben. Von Fitness-Trackern über Übungen bis hin zu individuellen Plänen – wir haben alles für dich!</p>
+                <h3>Empfehlungen für Gesundheit und Fitness</h3>
+                <ul>
+                    <li><strong>Sport pro Alter:</strong>
+                        <ul>
+                            <li>18–64 Jahre: Mindestens 150 Minuten moderate Bewegung pro Woche.</li>
+                            <li>65+ Jahre: Bewegung, die die Balance verbessert, 3-mal pro Woche.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Ernährung:</strong>
+                        <ul>
+                            <li>5 Portionen Obst und Gemüse pro Tag.</li>
+                            <li>2 Liter Wasser täglich.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Kalorien-Tracker -->
+            <section id="kalorien" style="display: none;">
+                <h2>Kalorien-Tracker</h2>
+                <form id="calorie-form">
+                    <label for="calories">Kalorien (kcal):</label>
+                    <input type="number" id="calories" required>
+                    <button type="submit">Hinzufügen</button>
+                </form>
+                <p>Gesamtkalorien: <span id="total-calories">0</span> kcal</p>
+                <div class="tracker-info">
+                    <div>
+                        <h3>Empfohlene Kalorien</h3>
+                        <p>2000–2500 kcal/Tag</p>
+                    </div>
+                    <div>
+                        <h3>Verbrannte Kalorien</h3>
+                        <p><span id="burned-calories">0</span> kcal</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Schritte-Tracker -->
+            <section id="schritte" style="display: none;">
+                <h2>Schritte-Tracker</h2>
+                <form id="steps-form">
+                    <label for="steps">Schritte:</label>
+                    <input type="number" id="steps" required>
+                    <button type="submit">Hinzufügen</button>
+                </form>
+                <p>Gesamtschritte: <span id="total-steps">0</span></p>
+                <div class="tracker-info">
+                    <div>
+                        <h3>Empfohlene Schritte</h3>
+                        <p>10.000 Schritte/Tag</p>
+                    </div>
+                    <div>
+                        <h3>Durchschnittliche Schritte</h3>
+                        <p><span id="average-steps">0</span></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Fitness-Übungen -->
+            <section id="uebungen" style="display: none;">
+                <h2>Fitness-Übungen</h2>
+                <div class="stopwatch">
+                    <p>Stoppuhr: <span id="stopwatch">00:00:00</span></p>
+                    <button id="start-stopwatch">Start</button>
+                    <button id="stop-stopwatch">Stop</button>
+                    <button id="reset-stopwatch">Reset</button>
+                </div>
+                <div>
+                    <p>Wiederholungen: <span id="repetitions">0</span></p>
+                    <button id="add-repetition">+1 Wiederholung</button>
+                </div>
+                <p>Hier sind einige Übungen, die du ausprobieren kannst:</p>
+                <ul>
+                    <li>Liegestütze</li>
+                    <li>Kniebeugen</li>
+                    <li>Plank</li>
+                    <li>Burpees</li>
+                    <li>Mountain Climbers</li>
+                    <li>Sit-ups</li>
+                    <li>Ausfallschritte</li>
+                </ul>
+            </section>
+
+            <!-- Fitness-Pläne -->
+            <section id="plaene" style="display: none;">
+                <h2>Fitness-Pläne</h2>
+                <div class="plan-options">
+                    <button data-plan="abnehmen">Abnehmen</button>
+                    <button data-plan="zunehmen">Zunehmen</button>
+                    <button data-plan="gleichbleiben">Gleichbleiben</button>
+                    <button data-plan="fitterwerden">Fitter werden</button>
+                </div>
+                <div id="plan-abnehmen" class="plan-details">
+                    <h3>Plan: Abnehmen</h3>
+                    <ul>
+                        <li>30 Minuten Cardio täglich.</li>
+                        <li>Krafttraining 3-mal pro Woche.</li>
+                        <li>Kaloriendefizit von 500 kcal/Tag.</li>
+                    </ul>
+                </div>
+                <div id="plan-zunehmen" class="plan-details">
+                    <h3>Plan: Zunehmen</h3>
+                    <ul>
+                        <li>Krafttraining 4-mal pro Woche.</li>
+                        <li>Kalorienüberschuss von 500 kcal/Tag.</li>
+                        <li>Proteinreiche Ernährung.</li>
+                    </ul>
+                </div>
+                <div id="plan-gleichbleiben" class="plan-details">
+                    <h3>Plan: Gleichbleiben</h3>
+                    <ul>
+                        <li>Ausgewogene Ernährung.</li>
+                        <li>Regelmäßige Bewegung (150 Minuten/Woche).</li>
+                    </ul>
+                </div>
+                <div id="plan-fitterwerden" class="plan-details">
+                    <h3>Plan: Fitter werden</h3>
+                    <ul>
+                        <li>Kombination aus Cardio und Krafttraining.</li>
+                        <li>4–5 Trainingseinheiten pro Woche.</li>
+                        <li>Flexible Ernährung.</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript-Code
+        // Anmeldefenster
+        document.getElementById('login-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            if (email && password) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-website').style.display = 'block';
+            } else {
+                alert('Bitte fülle alle Felder aus.');
+            }
+        });
+
+        // Menü
+        const menu = document.getElementById('menu');
+        const menuContent = document.getElementById('menu-content');
+        menu.addEventListener('click', function () {
+            menuContent.style.display = menuContent.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Menü-Links
+        document.querySelectorAll('#menu-content a').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                menuContent.style.display = 'none'; // Menü schließen
+                const targetId = this.getAttribute('href').substring(1);
+                document.querySelectorAll('section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                document.getElementById(targetId).style.display = 'block';
+            });
+        });
+
+        // Kalorien-Tracker
+        let totalCalories = 0;
+        let burnedCalories = 0;
+        document.getElementById('calorie-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const calories = parseInt(document.getElementById('calories').value);
+            totalCalories += calories;
+            document.getElementById('total-calories').textContent = totalCalories;
+            document.getElementById('calorie-form').reset();
+        });
+
+        // Schritte-Tracker
+        let totalSteps = 0;
+        let averageSteps = 0;
+        document.getElementById('steps-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const steps = parseInt(document.getElementById('steps').value);
+            totalSteps += steps;
+            averageSteps = totalSteps / 7; // Beispiel: Durchschnitt pro Woche
+            document.getElementById('total-steps').textContent = totalSteps;
+            document.getElementById('average-steps').textContent = Math.round(averageSteps);
+            document.getElementById('steps-form').reset();
+        });
+
+        // Stoppuhr
+        let stopwatchInterval;
+        let stopwatchTime = 0;
+        const stopwatchDisplay = document.getElementById('stopwatch');
+        document.getElementById('start-stopwatch').addEventListener('click', function () {
+            if (!stopwatchInterval) {
+                stopwatchInterval = setInterval(() => {
+                    stopwatchTime++;
+                    const hours = Math.floor(stopwatchTime / 3600);
+                    const minutes = Math.floor((stopwatchTime % 3600) / 60);
+                    const seconds = stopwatchTime % 60;
+                    stopwatchDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                }, 1000);
+            }
+        });
+        document.getElementById('stop-stopwatch').addEventListener('click', function () {
+            clearInterval(stopwatchInterval);
+            stopwatchInterval = null;
+        });
+        document.getElementById('reset-stopwatch').addEventListener('click', function () {
+            clearInterval(stopwatchInterval);
+            stopwatchInterval = null;
+            stopwatchTime = 0;
+            stopwatchDisplay.textContent = '00:00:00';
+        });
+
+        // Wiederholungen
+        let repetitions = 0;
+        document.getElementById('add-repetition').addEventListener('click', function () {
+            repetitions++;
+            document.getElementById('repetitions').textContent = repetitions;
+        });
+
+        // Fitness-Pläne
+        document.querySelectorAll('#plaene .plan-options button').forEach(button => {
+            button.addEventListener('click', function () {
+                const plan = this.getAttribute('data-plan');
+                document.querySelectorAll('#plaene .plan-details').forEach(details => {
+                    details.classList.remove('active');
+                });
+                document.getElementById(`plan-${plan}`).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
